@@ -1,4 +1,5 @@
 import { Logo } from "@/components/brand/Logo";
+import { BackgroundMusic } from "@/components/audio/BackgroundMusic";
 import { CopyrightYear } from "@/components/marketing/CopyrightYear";
 import { WaitlistForm } from "@/components/marketing/WaitlistForm";
 import { PlanetNav } from "@/components/planets/PlanetNav";
@@ -11,8 +12,12 @@ export default function HomePage() {
       <UniverseBackground />
 
       <div className="relative z-10 flex h-full flex-col">
-        <header className="flex flex-col items-center gap-5 px-6 pt-6 sm:pt-8">
-          <Logo />
+        <header className="relative flex flex-col items-center gap-5 px-6 pt-6 sm:pt-8">
+          <div className="flex flex-col items-center gap-3 sm:absolute sm:right-10 sm:top-8">
+            <Logo height={52} />
+            <BackgroundMusic />
+          </div>
+
           <PlanetNav />
         </header>
 

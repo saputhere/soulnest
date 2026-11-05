@@ -11,28 +11,37 @@ interface PlanetProps {
   readonly className?: string;
 }
 
-/** A cute shaded planet with a face, blush, and an optional ring. Decorative, so hidden from assistive technology. */
+/**
+ * A glossy, atmospheric planet with an optional ring. Decorative, so hidden from assistive technology.
+ * The ring is drawn in two halves so the planet appears to sit inside it.
+ */
 export function Planet({ palette, className }: PlanetProps) {
+  const ringStyle = "absolute left-1/2 top-1/2 h-[34%] w-[176%] -translate-x-1/2 -translate-y-1/2 -rotate-[16deg] rounded-[50%] border-[3px]";
+
   return (
     <span className={cn("relative block", className)} aria-hidden="true">
+      <span
+        className="absolute -inset-[20%] rounded-full blur-md"
+        style={{ background: `radial-gradient(circle, ${palette.light}40 35%, transparent 70%)` }}
+      />
+
       {palette.hasRing && (
-        <span className="absolute left-1/2 top-1/2 h-[38%] w-[175%] -translate-x-1/2 -translate-y-1/2 -rotate-[18deg] rounded-[50%] border-[3px] border-butter" />
+        <span className={cn(ringStyle, "border-white/25")} />
       )}
 
       <span
-        className="absolute inset-0 rounded-full shadow-[inset_-5px_-7px_12px_rgba(120,70,130,0.22),0_0_18px_rgba(255,200,230,0.35)]"
+        className="absolute inset-0 rounded-full"
         style={{
-          background: `radial-gradient(circle at 32% 28%, ${palette.light}, ${palette.dark} 75%)`,
+          background: `radial-gradient(circle at 30% 26%, ${palette.light} 0%, ${palette.dark} 55%, #1b1433 130%)`,
+          boxShadow: `inset -8px -12px 20px rgba(10, 6, 25, 0.55), 0 0 26px ${palette.light}55`,
         }}
       />
 
-      <span className="absolute left-[34%] top-[42%] h-[10%] w-[10%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4a3560]" />
-      <span className="absolute left-[66%] top-[42%] h-[10%] w-[10%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4a3560]" />
+      <span className="absolute inset-0 rounded-full bg-[linear-gradient(120deg,rgba(255,255,255,0.45)_0%,transparent_38%)] mix-blend-soft-light" />
 
-      <span className="absolute left-1/2 top-[56%] h-[12%] w-[18%] -translate-x-1/2 rounded-b-full border-b-2 border-[#4a3560]" />
-
-      <span className="absolute left-[22%] top-[55%] h-[10%] w-[14%] -translate-x-1/2 rounded-full bg-rose/70" />
-      <span className="absolute left-[78%] top-[55%] h-[10%] w-[14%] -translate-x-1/2 rounded-full bg-rose/70" />
+      {palette.hasRing && (
+        <span className={cn(ringStyle, "border-white/45 [clip-path:inset(50%_0_0_0)]")} />
+      )}
     </span>
   );
 }

@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { siteContent } from "@/content/siteContent";
+import { SiteGuard } from "@/components/security/SiteGuard";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -46,8 +47,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf8f5" },
-    { media: "(prefers-color-scheme: dark)", color: "#1b1a18" },
+    { media: "(prefers-color-scheme: light)", color: "#fff8fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e1638" },
   ],
 };
 
@@ -61,7 +62,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="bg-canvas font-sans text-ink antialiased">{children}</body>
+      <body className="bg-canvas font-sans text-ink antialiased">
+        <SiteGuard />
+        {children}
+      </body>
     </html>
   );
 }
