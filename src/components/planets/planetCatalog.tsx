@@ -51,22 +51,27 @@ export const planetSections: readonly PlanetSection[] = [
   {
     id: "plans",
     label: "Plans",
-    title: "Plans",
+    title: siteContent.plan.name,
     palette: { light: "#fff3b8", dark: "#ffd98a", hasRing: false },
     content: (
       <div className="space-y-6">
-        <p className="text-ink-muted">{siteContent.tiers.priceLabel}.</p>
-        {siteContent.tiers.items.map((tier) => (
-          <article key={tier.name} className="rounded-3xl border border-line bg-surface p-6">
-            <h3 className="font-serif text-2xl font-semibold text-ink">{tier.name}</h3>
-            <p className="mt-1 text-ink-muted">{tier.tagline}</p>
-            <ul className="mt-4 list-disc space-y-2 pl-5 text-ink">
-              {tier.includes.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
+        <p className="text-lg leading-relaxed text-ink">{siteContent.plan.tagline}</p>
+        <article className="rounded-3xl border border-line bg-surface p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-strong">
+            {siteContent.plan.priceLabel}
+          </p>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-ink">
+            {siteContent.plan.includes.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <a
+            href="#waitlist"
+            className="mt-6 inline-block rounded-full bg-sage-strong px-6 py-3 font-semibold text-on-sage"
+          >
+            {siteContent.plan.cta}
+          </a>
+        </article>
       </div>
     ),
   },

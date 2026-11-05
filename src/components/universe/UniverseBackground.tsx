@@ -21,6 +21,7 @@ interface Star {
   twinkleSpeed: number;
   twinklePhase: number;
   color: RGB;
+  isGatherer: boolean;
   gatherAngle: number;
   gatherRadius: number;
 }
@@ -80,10 +81,12 @@ interface Scene {
 
 const TAU = Math.PI * 2;
 const MAX_DEVICE_PIXEL_RATIO = 2;
-const GATHER_IDLE_MS = 450;
-const GATHER_EASE = 0.035;
+const GATHERER_COUNT = 14;
+const GATHER_IDLE_MS = 600;
+const GATHER_EASE = 0.02;
+const GATHER_ORBIT_SPEED = 0.0003;
 const GATHER_GLOW_RADIUS = 160;
-const SHOOTING_STAR_CHANCE_PER_FRAME = 0.006;
+const SHOOTING_STAR_CHANCE_PER_FRAME = 0.002;
 
 const PALETTE = {
   cream: [255, 248, 236],
@@ -132,33 +135,36 @@ function wrapAround(value: number, min: number, max: number): number {
   return value;
 }
 
-function createStar(width: number, height: number): Star {
+function createStar(width: number, height: number, isGatherer: boolean): Star {
   return {
     x: Math.random() * width,
     y: Math.random() * height,
-    vx: rand(-0.05, 0.05),
-    vy: rand(-0.08, 0.08),
+    vx: rand(-0.02, 0.02),
+    vy: rand(-0.03, 0.03),
     radius: rand(0.4, 1.8),
     brightness: rand(0.45, 1),
-    twinkleSpeed: rand(0.0008, 0.0025),
+    twinkleSpeed: rand(0.0005, 0.0015),
     twinklePhase: rand(0, TAU),
     color: pick(STAR_COLORS),
+    isGatherer,
     gatherAngle: rand(0, TAU),
-    gatherRadius: rand(18, 140),
+    gatherRadius: rand(30, 110),
   };
 }
 
 function createStars(width: number, height: number): Star[] {
   const count = Math.min(260, Math.max(120, Math.floor((width * height) / 5000)));
-  return Array.from({ length: count }, () => createStar(width, height));
+  return Array.from({ length: count }, (_, index) =>
+    createStar(width, height, index < GATHERER_COUNT),
+  );
 }
 
 function createPlanet(style: (typeof PLANET_STYLES)[number], width: number, height: number): Planet {
   return {
     x: Math.random() * width,
     y: Math.random() * height,
-    vx: rand(-0.15, 0.15),
-    vy: rand(-0.08, 0.08),
+    vx: rand(-0.06, 0.06),
+    vy: rand(-0.03, 0.03),
     radius: rand(14, 34),
     light: style.light,
     dark: style.dark,
@@ -189,7 +195,7 @@ function createGalaxy(x: number, y: number, radius: number): Galaxy {
     y,
     radius,
     rotation: rand(0, TAU),
-    spin: direction * rand(0.00015, 0.0004),
+    spin: direction * rand(0.00005, 0.00012),
     cosTilt: Math.cos(tilt),
     sinTilt: Math.sin(tilt),
     glow: pick([PALETTE.pink, PALETTE.lilac, PALETTE.sky]),
@@ -222,10 +228,10 @@ function spawnShootingStar(scene: Scene): ShootingStar {
     y: rand(0, scene.height * 0.35),
     dirX: Math.cos(angle),
     dirY: Math.sin(angle),
-    speed: rand(9, 15),
-    length: rand(140, 260),
+    speed: rand(7, 11),
+    length: rand(140, 240),
     age: 0,
-    lifespan: rand(70, 110),
+    lifespan: rand(90, 130),
     color: pick([PALETTE.pink, PALETTE.sky, PALETTE.butter]),
   };
 }
@@ -265,7 +271,7 @@ function updateShootingStars(scene: Scene): void {
   }
 }
 
-/** Advances the scene one step. Gather strength eases toward 1 when the cursor has been still. */
+/** Advances the scene one step. Gather strength eases toward 1 only while the cursor is still. */
 function updateScene(scene: Scene, pointer: PointerState, now: number): void {
   const isIdle = pointer.isInside && now - pointer.lastMovedAt > GATHER_IDLE_MS;
   scene.gather += ((isIdle ? 1 : 0) - scene.gather) * GATHER_EASE;
@@ -276,16 +282,16 @@ function updateScene(scene: Scene, pointer: PointerState, now: number): void {
   updateShootingStars(scene);
 }
 
-/** Blends a star from its drifting position toward an orbit around the cursor. */
+/** Only gatherer stars leave their drifting path. All other stars stay in the background. */
 function positionStar(
   star: Star,
   gather: number,
   pointer: PointerState,
   now: number,
 ): { x: number; y: number } {
-  if (gather < 0.001) return { x: star.x, y: star.y };
+  if (!star.isGatherer || gather < 0.001) return { x: star.x, y: star.y };
 
-  const orbit = star.gatherAngle + now * 0.0008;
+  const orbit = star.gatherAngle + now * GATHER_ORBIT_SPEED;
   const targetX = pointer.x + Math.cos(orbit) * star.gatherRadius;
   const targetY = pointer.y + Math.sin(orbit) * star.gatherRadius;
 
@@ -382,10 +388,11 @@ function drawStar(
 ): void {
   const { x, y } = positionStar(star, scene.gather, pointer, now);
   const twinkle = 0.5 + 0.5 * Math.sin(now * star.twinkleSpeed + star.twinklePhase);
-  const alpha = Math.min(1, star.brightness * (0.35 + 0.65 * twinkle) + scene.gather * 0.35);
+  const gatherBoost = star.isGatherer ? scene.gather : 0;
+  const alpha = Math.min(1, star.brightness * (0.35 + 0.65 * twinkle) + gatherBoost * 0.35);
 
   ctx.beginPath();
-  ctx.arc(x, y, star.radius + scene.gather * 0.6, 0, TAU);
+  ctx.arc(x, y, star.radius + gatherBoost * 0.6, 0, TAU);
   ctx.fillStyle = rgba(star.color, alpha);
   ctx.fill();
 }
@@ -429,8 +436,8 @@ function drawScene(ctx: CanvasRenderingContext2D, scene: Scene, pointer: Pointer
 }
 
 /**
- * Full-screen cosmic background: drifting planets, spiral galaxies, twinkling stars,
- * and stars that gather around the cursor when it pauses.
+ * Full-screen cosmic background: slowly drifting planets, spiral galaxies, and twinkling stars.
+ * A small group of stars gathers around the cursor when it pauses; the rest stay in place.
  * With reduced motion enabled, it draws one still frame and does not animate.
  */
 export function UniverseBackground() {

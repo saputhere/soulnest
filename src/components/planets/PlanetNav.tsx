@@ -6,7 +6,7 @@ import { Planet } from "./Planet";
 import { PlanetModal } from "./PlanetModal";
 import { planetSections, type PlanetSection } from "./planetCatalog";
 
-const SPIN_IN_TRANSITION = { type: "spring", stiffness: 120, damping: 12 } as const;
+const SPIN_IN_TRANSITION = { duration: 1.8, ease: [0.22, 1, 0.36, 1] } as const;
 
 interface PlanetCardProps {
   readonly section: PlanetSection;

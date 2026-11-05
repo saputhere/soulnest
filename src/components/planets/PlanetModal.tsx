@@ -6,10 +6,10 @@ import { useEffect, useRef } from "react";
 import { Planet } from "./Planet";
 import type { PlanetSection } from "./planetCatalog";
 
-const OPEN_SPRING = { type: "spring", stiffness: 170, damping: 16, mass: 0.9 } as const;
-const CLOSE_TRANSITION = { duration: 0.5, ease: [0.5, 0, 0.75, 0] } as const;
-const BACKDROP_TRANSITION = { duration: 0.35 } as const;
-const CONTENT_TRANSITION = { delay: 0.22, duration: 0.45, ease: "easeOut" } as const;
+const OPEN_SPRING = { type: "spring", stiffness: 75, damping: 20, mass: 1.1 } as const;
+const CLOSE_TRANSITION = { duration: 0.8, ease: [0.45, 0, 0.55, 1] } as const;
+const BACKDROP_TRANSITION = { duration: 0.6 } as const;
+const CONTENT_TRANSITION = { delay: 0.45, duration: 0.7, ease: "easeOut" } as const;
 
 interface PlanetModalProps {
   readonly section: PlanetSection;

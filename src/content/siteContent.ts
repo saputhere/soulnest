@@ -11,12 +11,6 @@ export interface Step {
   readonly description: string;
 }
 
-export interface Tier {
-  readonly name: string;
-  readonly tagline: string;
-  readonly includes: readonly string[];
-}
-
 export interface FaqItem {
   readonly question: string;
   readonly answer: string;
@@ -39,7 +33,7 @@ export const siteContent = {
     badge: "Waitlist now open",
     headline: "A Place Where Love Never Stops Arriving.",
     subheadline:
-      "SoulNest keeps your memories safe, delivers letters from your past self, and sends beautiful monthly happiness boxes to the people and moments you treasure.",
+      "Someone you love is thinking of you right now. SoulNest makes sure those feelings never fade: letters that arrive when you need them, memories kept safe, and small surprises that remind you you're held.",
     primaryCta: "Start Your Journey",
     secondaryCta: "Explore SoulNest",
   },
@@ -47,123 +41,114 @@ export const siteContent = {
   features: [
     {
       icon: "mail",
-      title: "Monthly happiness boxes",
+      title: "A box that feels like a hug",
       description:
-        "Handwritten-style letters, inspirational notes, cute stickers, small gifts, and original artwork, delivered every month.",
+        "Each month, a handwritten-style letter, an encouraging note, original art, and a small gift arrive at your door, like someone remembered you.",
     },
     {
       icon: "sparkles",
-      title: "Future surprises",
+      title: "Surprises for your big moments",
       description:
-        "Schedule a gift for your graduation, your birthday, your first job, or the day you become a parent. You choose what's inside.",
+        "Graduations, first jobs, anniversaries, the day you become a parent. Choose what should be waiting for you, and let the joy find you on the day it matters.",
     },
     {
       icon: "hourglass",
-      title: "Letters to your future self",
+      title: "Words for the person you're becoming",
       description:
-        "Write today, and SoulNest delivers your letter months or years from now, right when you need to read it.",
+        "Write to your future self today. We keep your letter safe and deliver it months or years from now, on the day you need your own kindness most.",
     },
     {
       icon: "lock",
-      title: "Memory Vault",
+      title: "A private place for your memories",
       description:
-        "A private digital journal for photos, letters, videos, voice recordings, and stories. Export them as printable memory books or digital postcards.",
+        "Photos, voice notes, letters, and stories, kept in a space that belongs only to you. Your heart's collection stays yours, always.",
     },
     {
       icon: "heart",
-      title: "Forever memories",
+      title: "A gentle place to remember",
       description:
-        "Create a private memorial page for someone you've lost. Add their photos, stories, and letters, and share only when you choose.",
+        "Create a quiet memorial page for someone you miss. Keep their laughter, their stories, and their words close, and share them only when you feel ready.",
     },
     {
       icon: "gift",
-      title: "Surprise someone",
+      title: "Let someone feel loved",
       description:
-        "Send a secret gift to a friend, partner, or family member, and let them discover it without any spoilers.",
+        "Secretly send a surprise to a friend, a partner, or someone far away. Watch their face light up when it arrives, and know you made their day.",
     },
   ] satisfies readonly Feature[],
 
   steps: [
     {
-      title: "Join the waitlist",
-      description: "Leave your email and we'll let you know the moment your early access opens.",
-    },
-    {
-      title: "Choose your plan",
-      description: "Pick Starter, Premium, or Family, and decide how much you want to keep close.",
-    },
-    {
-      title: "Receive your moments",
+      title: "Say yes to joy",
       description:
-        "Open your monthly box, read the letters you've saved for later, and keep every memory safe in your vault.",
+        "Join the waitlist and tell us you're ready for small moments that make your days softer.",
+    },
+    {
+      title: "Choose what you'd love to receive",
+      description:
+        "Pick the kind of happiness that feels like you, and decide what you want to save for your future self.",
+    },
+    {
+      title: "Open, read, and feel held",
+      description:
+        "Each box arrives like a little hello from someone who cares. Keep the letters, save the memories, and come back to them whenever you need a smile.",
     },
   ] satisfies readonly Step[],
 
-  tiers: {
+  plan: {
+    name: "SoulNest Membership",
+    tagline: "Everything SoulNest offers, in one simple plan, so you can focus on feeling loved.",
     priceLabel: "Pricing revealed at launch",
-    items: [
-      {
-        name: "Starter",
-        tagline: "A gentle start for a little monthly happiness.",
-        includes: [
-          "Monthly happiness box",
-          "Letters, notes, stickers, and a small gift",
-          "Memory Vault for your personal memories",
-        ],
-      },
-      {
-        name: "Premium",
-        tagline: "For the people who want to plan their future joy.",
-        includes: [
-          "Everything in Starter",
-          "Future surprises and letters to your future self",
-          "Forever memories memorial pages",
-        ],
-      },
-      {
-        name: "Family",
-        tagline: "Happiness shared across your whole household.",
-        includes: [
-          "Everything in Premium",
-          "Shared boxes for your household",
-          "Family memory pages for loved ones",
-        ],
-      },
-    ] satisfies readonly Tier[],
+    includes: [
+      "A monthly happiness box with letters, notes, stickers, art, and a small gift",
+      "Future surprises scheduled for your milestones",
+      "Letters to your future self, delivered when the time is right",
+      "A private Memory Vault for photos, voice notes, videos, and stories",
+      "Memorial pages to keep the people you miss close to your heart",
+      "Secret surprises you can send to anyone you love",
+      "Printable memory books and digital postcards",
+      "Seasonal surprises and affirmations to brighten your month",
+    ],
+    cta: "Join the waitlist",
   },
 
   faq: [
     {
-      question: "What is SoulNest?",
+      question: "What makes SoulNest different from a gift shop?",
       answer:
-        "SoulNest is a subscription that delivers happiness. Each month you receive a curated box of letters, art, and small gifts, and you can also keep memories, plan future surprises, and write letters to your future self.",
+        "SoulNest isn't a store. It's a home for feelings. Every box, letter, and memory is chosen to make you feel seen, comforted, and cared for.",
     },
     {
       question: "How do letters to my future self work?",
       answer:
-        "You write a letter today and choose the date it should arrive. SoulNest keeps it safe and delivers it on that date, months or years from now.",
+        "You write to the person you're becoming and choose when it should arrive. We keep it safe and deliver it on that day, whether that's next month or ten years from now.",
     },
     {
-      question: "Is my Memory Vault private?",
+      question: "Is my Memory Vault truly private?",
       answer:
-        "Yes. Everything you store in your Memory Vault is private by default. Only you can see it unless you choose to share something.",
+        "Yes. Everything you store is private by default. Only you can see it, unless you decide to share something with someone you trust.",
     },
     {
-      question: "How do I get early access?",
+      question: "I'm going through a hard time. Can SoulNest help?",
       answer:
-        "Join the waitlist with your email address. We'll send you your early access details before we open to everyone.",
+        "SoulNest can offer comfort through letters, memories, and gentle reminders. It isn't a substitute for professional support, so if you're struggling, please reach out to someone you trust or a qualified professional.",
     },
     {
       question: "Can I give SoulNest as a gift?",
       answer:
-        "Gift subscriptions are part of our plans and will be available at launch. Join the waitlist to hear about them first.",
+        "Gift subscriptions are coming at launch. Join the waitlist and be the first to know, so you can surprise someone you love.",
+    },
+    {
+      question: "How do I get early access?",
+      answer:
+        "Join the waitlist with your email address. We'll send your early access details before we open to everyone.",
     },
   ] satisfies readonly FaqItem[],
 
   waitlist: {
     headline: "Be the first to feel at home.",
     description:
-      "Join the waitlist to get early access, plus first look at new boxes and features.",
+      "Join the waitlist for early access, a first look at new boxes, and a little warmth in your inbox.",
     placeholder: "you@example.com",
     cta: "Join the waitlist",
     successMessage: "You're on the list. We'll be in touch soon with your early access details.",

@@ -5,8 +5,6 @@ import { PlanetNav } from "@/components/planets/PlanetNav";
 import { UniverseBackground } from "@/components/universe/UniverseBackground";
 import { siteContent } from "@/content/siteContent";
 
-const planNames = siteContent.tiers.items.map((tier) => tier.name).join("  ·  ");
-
 export default function HomePage() {
   return (
     <div className="dark relative h-dvh overflow-hidden bg-canvas text-ink">
@@ -36,7 +34,7 @@ export default function HomePage() {
             <WaitlistForm />
           </div>
 
-          <p className="mt-5 text-sm tracking-wide text-ink-muted">{planNames}</p>
+          <p className="mt-5 text-sm tracking-wide text-ink-muted">{siteContent.plan.name}</p>
         </main>
 
         <footer className="flex flex-col items-center gap-1 pb-6 text-xs text-ink-muted">
