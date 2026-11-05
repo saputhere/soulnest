@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-sage: var(--sage);
+  --color-sage-strong: var(--sage-strong);
+  --color-on-sage: var(--on-sage);
+  --color-rose: var(--rose);
+  --color-rose-strong: var(--rose-strong);
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-line: var(--line);
+
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-glow: glow 4s ease-in-out infinite;
+}
+
+/*
+ * Light palette (default).
+ * Decorative colors (sage, rose, gold) are for illustrations and backgrounds.
+ * "-strong" variants are for text and button fills that must meet WCAG AA contrast.
+ */
+:root {
+  color-scheme: light;
+
+  --canvas: #faf8f5;
+  --surface: #f2efea;
+  --raised: #ffffff;
+  --ink: #2e2e2e;
+  --ink-muted: #5c5853;
+  --sage: #8fae9d;
+  --sage-strong: #4f6f5c;
+  --on-sage: #ffffff;
+  --rose: #d8a6a6;
+  --rose-strong: #8a4f4f;
+  --gold: #c9a76a;
+  --gold-strong: #7a5c24;
+  --line: #e4ded5;
+}
+
+/* Dark palette: warm charcoal, with lighter tints of the brand colors. */
+.dark {
+  color-scheme: dark;
+
+  --canvas: #1b1a18;
+  --surface: #242220;
+  --raised: #2b2927;
+  --ink: #f3efe8;
+  --ink-muted: #b8b2a8;
+  --sage: #7f9e8c;
+  --sage-strong: #a9c7b5;
+  --on-sage: #1b1a18;
+  --rose: #b98585;
+  --rose-strong: #e9c4c4;
+  --gold: #b8955a;
+  --gold-strong: #d9bc85;
+  --line: #3a3733;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-glow {
+    animation: none;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
