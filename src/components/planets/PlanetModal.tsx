@@ -1,12 +1,15 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { X } from "lucide-react";
+import { Heart, Star, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Planet } from "./Planet";
 import type { PlanetSection } from "./planetCatalog";
 
-const OPEN_TRANSITION = { duration: 0.75, ease: [0.22, 1, 0.36, 1] } as const;
+const OPEN_SPRING = { type: "spring", stiffness: 170, damping: 16, mass: 0.9 } as const;
+const CLOSE_TRANSITION = { duration: 0.5, ease: [0.5, 0, 0.75, 0] } as const;
+const BACKDROP_TRANSITION = { duration: 0.35 } as const;
+const CONTENT_TRANSITION = { delay: 0.22, duration: 0.45, ease: "easeOut" } as const;
 
 interface PlanetModalProps {
   readonly section: PlanetSection;
@@ -14,13 +17,13 @@ interface PlanetModalProps {
 }
 
 /**
- * Popup that spins and zooms out of its planet, like an app opening.
- * The shared layoutId links it to the planet button, so closing shrinks it back into place.
+ * Popup that springs open from its planet while spinning, with a pastel header and floating decorations.
+ * The shared layoutId links it to the planet button, so closing spins it back into place.
  */
 export function PlanetModal({ section, onClose }: PlanetModalProps) {
   const reduceMotion = useReducedMotion();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const { id, title, palette, content } = section;
+  const { id, label, title, palette, content } = section;
   const titleId = `planet-title-${id}`;
 
   useEffect(() => {
@@ -36,16 +39,16 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={BACKDROP_TRANSITION}
     >
       <motion.div
         aria-hidden="true"
         onClick={onClose}
-        className="absolute inset-0 bg-canvas/75 backdrop-blur-md"
+        className="absolute inset-0 bg-canvas/70 backdrop-blur-sm"
       />
 
       <motion.section
@@ -53,18 +56,43 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        initial={reduceMotion ? { opacity: 0 } : { rotate: -360, scale: 0.3, opacity: 0.6 }}
+        initial={reduceMotion ? { opacity: 0 } : { rotate: -270, scale: 0.2, opacity: 0 }}
         animate={{ rotate: 0, scale: 1, opacity: 1 }}
-        exit={reduceMotion ? { opacity: 0 } : { rotate: 360, scale: 0.3, opacity: 0 }}
-        transition={OPEN_TRANSITION}
-        className="relative flex max-h-[85dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] border border-line bg-raised shadow-2xl"
+        exit={
+          reduceMotion
+            ? { opacity: 0, transition: CLOSE_TRANSITION }
+            : { rotate: 270, scale: 0.2, opacity: 0, transition: CLOSE_TRANSITION }
+        }
+        transition={OPEN_SPRING}
+        className="relative flex max-h-[85dvh] w-full max-w-xl flex-col overflow-hidden rounded-[2.5rem] border-2 border-line bg-raised shadow-[0_24px_80px_-20px_rgba(255,160,205,0.5)]"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-line px-6 py-5 md:px-8">
-          <div className="flex items-center gap-4">
-            <Planet palette={palette} className="h-11 w-11" />
-            <h2 id={titleId} className="font-serif text-2xl font-semibold text-ink">
-              {title}
-            </h2>
+        <header
+          className="relative shrink-0 overflow-hidden px-6 pb-7 pt-8 md:px-8"
+          style={{
+            background: `linear-gradient(135deg, ${palette.light} 0%, ${palette.dark} 150%)`,
+          }}
+        >
+          <Heart
+            className="absolute left-[8%] top-[18%] h-4 w-4 animate-float fill-rose text-rose-strong/80"
+            aria-hidden="true"
+          />
+          <Star
+            className="absolute right-[22%] top-[14%] h-5 w-5 animate-wiggle fill-butter text-butter"
+            aria-hidden="true"
+          />
+          <Star
+            className="absolute bottom-[16%] left-[42%] h-3 w-3 animate-glow fill-white text-white"
+            aria-hidden="true"
+          />
+
+          <div className="relative flex items-center gap-5">
+            <Planet palette={palette} className="h-16 w-16 shrink-0 animate-float" />
+            <div className="min-w-0 pr-12">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#7a5a8a]">{label}</p>
+              <h2 id={titleId} className="mt-1 font-serif text-3xl font-semibold text-[#3d2a52]">
+                {title}
+              </h2>
+            </div>
           </div>
 
           <button
@@ -72,13 +100,20 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink-muted transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sage-strong"
+            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-[#3d2a52] shadow-sm transition hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3d2a52]"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
-        </div>
+        </header>
 
-        <div className="overflow-y-auto px-6 py-6 md:px-8 md:py-8">{content}</div>
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={CONTENT_TRANSITION}
+          className="min-h-0 overflow-y-auto px-6 py-6 md:px-8 md:py-8"
+        >
+          {content}
+        </motion.div>
       </motion.section>
     </motion.div>
   );

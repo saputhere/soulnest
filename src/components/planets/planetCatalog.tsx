@@ -15,12 +15,12 @@ export const planetSections: readonly PlanetSection[] = [
     id: "how-it-works",
     label: "How it works",
     title: "How it works",
-    palette: { light: "#c8dccf", dark: "#4f6f5c", hasRing: false },
+    palette: { light: "#c9f7e3", dark: "#8fe3c0", hasRing: false },
     content: (
       <ol className="space-y-8">
         {siteContent.steps.map((step, index) => (
           <li key={step.title} className="flex gap-5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-surface font-serif text-xl font-semibold text-sage-strong">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mint font-serif text-xl font-semibold text-[#3d2a52]">
               {index + 1}
             </span>
             <div>
@@ -36,7 +36,7 @@ export const planetSections: readonly PlanetSection[] = [
     id: "features",
     label: "Features",
     title: "Features",
-    palette: { light: "#f3d6d6", dark: "#8a4f4f", hasRing: true },
+    palette: { light: "#ffd1e5", dark: "#f7a3c9", hasRing: true },
     content: (
       <ul className="space-y-8">
         {siteContent.features.map((feature) => (
@@ -52,7 +52,7 @@ export const planetSections: readonly PlanetSection[] = [
     id: "plans",
     label: "Plans",
     title: "Plans",
-    palette: { light: "#f1dfb4", dark: "#7a5c24", hasRing: false },
+    palette: { light: "#fff3b8", dark: "#ffd98a", hasRing: false },
     content: (
       <div className="space-y-6">
         <p className="text-ink-muted">{siteContent.tiers.priceLabel}.</p>
@@ -74,7 +74,7 @@ export const planetSections: readonly PlanetSection[] = [
     id: "faq",
     label: "FAQ",
     title: "Questions, answered gently",
-    palette: { light: "#d6d3ee", dark: "#4c4880", hasRing: false },
+    palette: { light: "#e3d7ff", dark: "#b9a2f5", hasRing: false },
     content: (
       <div className="space-y-6">
         {siteContent.faq.map((item) => (

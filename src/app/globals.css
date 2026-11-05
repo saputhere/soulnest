@@ -6,6 +6,7 @@
   --color-raised: var(--raised);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
   --color-sage: var(--sage);
   --color-sage-strong: var(--sage-strong);
   --color-on-sage: var(--on-sage);
@@ -13,55 +14,63 @@
   --color-rose-strong: var(--rose-strong);
   --color-gold: var(--gold);
   --color-gold-strong: var(--gold-strong);
-  --color-line: var(--line);
+  --color-lilac: var(--lilac);
+  --color-sky: var(--sky);
+  --color-butter: var(--butter);
+  --color-mint: var(--mint);
 
   --font-serif: var(--font-cormorant), Georgia, serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
 
-  --animate-float: float 8s ease-in-out infinite;
+  --animate-float: float 7s ease-in-out infinite;
   --animate-glow: glow 4s ease-in-out infinite;
+  --animate-wiggle: wiggle 2.8s ease-in-out infinite;
 }
 
-/*
- * Light palette (default).
- * Decorative colors (sage, rose, gold) are for illustrations and backgrounds.
- * "-strong" variants are for text and button fills that must meet WCAG AA contrast.
- */
+/* Light palette: soft baby pastels. */
 :root {
   color-scheme: light;
 
-  --canvas: #faf8f5;
-  --surface: #f2efea;
+  --canvas: #fff8fb;
+  --surface: #fdf0f6;
   --raised: #ffffff;
-  --ink: #2e2e2e;
-  --ink-muted: #5c5853;
-  --sage: #8fae9d;
-  --sage-strong: #4f6f5c;
+  --ink: #4a3558;
+  --ink-muted: #7a6690;
+  --line: #f0d6e6;
+  --sage: #c9f7e3;
+  --sage-strong: #3f9274;
   --on-sage: #ffffff;
-  --rose: #d8a6a6;
-  --rose-strong: #8a4f4f;
-  --gold: #c9a76a;
-  --gold-strong: #7a5c24;
-  --line: #e4ded5;
+  --rose: #ffc4dd;
+  --rose-strong: #b84a7a;
+  --gold: #ffe08a;
+  --gold-strong: #9a6b00;
+  --lilac: #e3d7ff;
+  --sky: #cfeaff;
+  --butter: #fff3b8;
+  --mint: #c9f7e3;
 }
 
-/* Dark palette: warm charcoal, with lighter tints of the brand colors. */
+/* Dark palette: the night sky the page uses by default. */
 .dark {
   color-scheme: dark;
 
-  --canvas: #1b1a18;
-  --surface: #242220;
-  --raised: #2b2927;
-  --ink: #f3efe8;
-  --ink-muted: #b8b2a8;
-  --sage: #7f9e8c;
-  --sage-strong: #a9c7b5;
-  --on-sage: #1b1a18;
-  --rose: #b98585;
-  --rose-strong: #e9c4c4;
-  --gold: #b8955a;
-  --gold-strong: #d9bc85;
-  --line: #3a3733;
+  --canvas: #1e1638;
+  --surface: #2a2050;
+  --raised: #30275a;
+  --ink: #fff4fb;
+  --ink-muted: #d2c6ea;
+  --line: #4b3f78;
+  --sage: #a8f0d4;
+  --sage-strong: #a8f0d4;
+  --on-sage: #2a1f4a;
+  --rose: #ffb8d6;
+  --rose-strong: #ffc9e2;
+  --gold: #ffe08a;
+  --gold-strong: #ffeab0;
+  --lilac: #bfaef5;
+  --sky: #a9dcff;
+  --butter: #fff0a6;
+  --mint: #b5f5da;
 }
 
 @keyframes float {
@@ -70,14 +79,14 @@
     transform: translateY(0) rotate(-2deg);
   }
   50% {
-    transform: translateY(-14px) rotate(2deg);
+    transform: translateY(-12px) rotate(2deg);
   }
 }
 
 @keyframes glow {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.4;
     transform: scale(0.9);
   }
   50% {
@@ -86,9 +95,20 @@
   }
 }
 
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
-  .animate-glow {
+  .animate-glow,
+  .animate-wiggle {
     animation: none;
   }
 }
