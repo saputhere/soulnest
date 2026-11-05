@@ -1,45 +1,46 @@
+import Image from "next/image";
 import { cn } from "@/lib/cn";
-
-interface LogoMarkProps {
-  readonly className?: string;
-}
-
-/**
- * Temporary heart-shaped nest with a star. Replace the body with your
- * SoulNest logo file once it's added (for example, as an inline SVG component).
- */
-export function LogoMark({ className }: LogoMarkProps) {
-  return (
-    <svg
-      viewBox="0 0 48 48"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn("h-8 w-8", className)}
-      aria-hidden="true"
-    >
-      <path d="M24 40C16 35 8 29 8 20a8 8 0 0 1 16-2 8 8 0 0 1 16 2c0 9-8 15-16 20z" />
-      <path d="M14 36c3 1 6 2 10 2s7-1 10-2" />
-      <path
-        d="M24 14l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"
-        fill="currentColor"
-        stroke="none"
-      />
-    </svg>
-  );
-}
 
 interface LogoProps {
   readonly className?: string;
+  /** Pixel height of the logo image. Width follows the image's own proportions. */
+  readonly height?: number;
 }
 
-export function Logo({ className }: LogoProps) {
+/**
+ * SoulNest logo from /public/soulnest-logo.png, shown on a soft pastel pill
+ * so it stays visible on the dark night-sky background.
+ */
+export function Logo({ className, height = 44 }: LogoProps) {
   return (
-    <span className={cn("inline-flex items-center gap-2 font-serif text-2xl font-semibold text-ink", className)}>
-      <LogoMark className="h-7 w-7 text-sage-strong" />
-      SoulNest
+    <span
+      className={cn(
+        "inline-flex items-center justify-center rounded-full bg-white/90 px-4 py-2 shadow-[0_8px_30px_-10px_rgba(255,183,210,0.6)] ring-2 ring-rose/60",
+        className,
+      )}
+    >
+      <Image
+        src="/soulnest-logo.png"
+        alt="SoulNest"
+        width={height * 3}
+        height={height}
+        priority
+        style={{ height, width: "auto" }}
+      />
     </span>
+  );
+}
+
+/** Kept for existing imports. Renders the same logo. */
+export function LogoMark({ className }: { readonly className?: string }) {
+  return (
+    <Image
+      src="/soulnest-logo.png"
+      alt=""
+      aria-hidden="true"
+      width={44}
+      height={44}
+      className={cn("h-11 w-11 object-contain", className)}
+    />
   );
 }
