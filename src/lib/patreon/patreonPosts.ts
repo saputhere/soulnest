@@ -20,6 +20,7 @@ interface PatreonPostResource {
 }
 
 const MAX_POSTS = 8;
+const PATREON_ORIGIN = "https://www.patreon.com";
 const FALLBACK_URL = "https://www.patreon.com/cw/soulnest";
 
 /**
@@ -33,6 +34,18 @@ export class PatreonPostsError extends Error {
     super(message);
     this.name = "PatreonPostsError";
   }
+}
+
+/**
+ * Patreon returns post URLs as paths such as "/soulnest/posts/slug-123". Those only work
+ * on Patreon, so they must be resolved against Patreon's origin, not this site's domain.
+ * Absolute URLs are kept as they are. Anything else falls back to the creator page.
+ */
+export function toPatreonUrl(value: string | null | undefined): string {
+  if (!value) return FALLBACK_URL;
+  if (value.startsWith("https://") || value.startsWith("http://")) return value;
+  if (value.startsWith("/")) return `${PATREON_ORIGIN}${value}`;
+  return FALLBACK_URL;
 }
 
 /**
@@ -56,7 +69,7 @@ export async function getPublicPatreonPosts(): Promise<PatreonPost[]> {
   });
 
   const response = await fetch(
-    `https://www.patreon.com/api/oauth2/v2/campaigns/${campaignId}/posts?${params}`,
+    `${PATREON_ORIGIN}/api/oauth2/v2/campaigns/${campaignId}/posts?${params}`,
     { headers: { Authorization: `Bearer ${token}` } },
   );
 
@@ -67,19 +80,15 @@ export async function getPublicPatreonPosts(): Promise<PatreonPost[]> {
 
   const payload = (await response.json()) as { data?: PatreonPostResource[] };
   const allPosts = payload.data ?? [];
-
-  if (allPosts.length > 0) {
-    console.info("[patreon] attribute names on first post:", Object.keys(allPosts[0].attributes));
-  }
-
   const publicPosts = allPosts.filter((post) => post.attributes.is_public === true);
+
   console.info(`[patreon] fetched ${allPosts.length} posts, ${publicPosts.length} public`);
 
   return publicPosts.slice(0, MAX_POSTS).map((post) => ({
     id: post.id,
     title: post.attributes.title ?? "Untitled post",
     teaser: "",
-    url: post.attributes.url ?? FALLBACK_URL,
+    url: toPatreonUrl(post.attributes.url),
     publishedAt: post.attributes.published_at ?? null,
   }));
 }
