@@ -11,17 +11,21 @@ interface Message {
   readonly text: string;
 }
 
-const GREETING =
-  "Hi, I'm the SoulNest help assistant. Pick a question below, or type your own.";
+const GREETING = "Hi, I'm the SoulNest help assistant. Pick a question below, or type your own.";
 
 const CHIP =
-  "rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-left text-xs text-white/85 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-white";
+  "shrink-0 whitespace-nowrap rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/85 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-white";
+
+/** Thin, subtle scrollbar so it doesn't dominate the small chat window. */
+const THIN_SCROLL = "[scrollbar-width:thin] [scrollbar-color:rgba(181,245,218,0.35)_transparent]";
+
+const INITIAL_SUGGESTIONS = HELP_ENTRIES.filter((entry) => entry.id !== "crisis").slice(0, 5);
 
 /** Floating help chat with suggested questions. Answers come from a fixed set, so it can't invent policies. */
 export function HelpChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{ id: 0, from: "bot", text: GREETING }]);
-  const [suggestions, setSuggestions] = useState<HelpEntry[]>(() => HELP_ENTRIES.filter((e) => e.id !== "crisis").slice(0, 5));
+  const [suggestions, setSuggestions] = useState<HelpEntry[]>(INITIAL_SUGGESTIONS);
   const [draft, setDraft] = useState("");
   const nextId = useRef(1);
   const listRef = useRef<HTMLDivElement>(null);
@@ -68,23 +72,32 @@ export function HelpChat() {
         aria-label={isOpen ? "Close help" : "Open help chat"}
         className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#c9f7e3] to-[#cfeaff] text-[#2a1f4a] shadow-2xl transition hover:-translate-y-0.5 hover:shadow-[0_15px_40px_-10px_rgba(181,245,218,0.6)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
-        {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <MessageCircle className="h-6 w-6" aria-hidden="true" />}
+        {isOpen ? (
+          <X className="h-6 w-6" aria-hidden="true" />
+        ) : (
+          <MessageCircle className="h-6 w-6" aria-hidden="true" />
+        )}
       </button>
 
       {isOpen ? (
         <section
           id={titleId}
           aria-labelledby={`${titleId}-title`}
-          className="fixed bottom-24 right-5 z-40 flex h-[32rem] max-h-[70dvh] w-[min(22rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#241a40] shadow-2xl"
+          className="fixed bottom-24 right-5 z-40 flex max-h-[calc(100dvh-8rem)] w-[min(24rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#241a40] shadow-2xl"
         >
-          <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
             <h2 id={`${titleId}-title`} className="font-serif text-lg text-white">
               SoulNest help
             </h2>
             <span className="text-[11px] uppercase tracking-[0.2em] text-white/40">Quick answers</span>
           </header>
 
-          <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4" role="log" aria-live="polite">
+          <div
+            ref={listRef}
+            className={`min-h-40 flex-1 space-y-3 overflow-y-auto px-4 py-4 ${THIN_SCROLL}`}
+            role="log"
+            aria-live="polite"
+          >
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.from === "user" ? "justify-end" : "justify-start"}`}>
                 <p
@@ -100,18 +113,23 @@ export function HelpChat() {
             ))}
           </div>
 
-          <div className="border-t border-white/10 px-4 py-3">
+          <div className="shrink-0 border-t border-white/10 px-4 py-3">
             <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-white/40">Suggested questions</p>
-            <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
+            <div className={`flex snap-x gap-2 overflow-x-auto pb-2 ${THIN_SCROLL}`}>
               {suggestions.map((entry) => (
-                <button key={entry.id} type="button" onClick={() => ask(entry.question, entry.question)} className={CHIP}>
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => ask(entry.question, entry.question)}
+                  className={`${CHIP} snap-start`}
+                >
                   {entry.question}
                 </button>
               ))}
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-white/10 bg-white/5 p-3">
+          <form onSubmit={handleSubmit} className="flex shrink-0 items-center gap-2 border-t border-white/10 bg-white/5 p-3">
             <label htmlFor={`${titleId}-input`} className="sr-only">
               Type your question
             </label>
@@ -133,11 +151,9 @@ export function HelpChat() {
             </button>
           </form>
 
-          <p className="px-4 pb-3 text-[11px] text-white/35">
-            Need a person? Email {SUPPORT_EMAIL}
-          </p>
+          <p className="shrink-0 px-4 pb-3 text-[11px] text-white/35">Need a person? Email {SUPPORT_EMAIL}</p>
         </section>
       ) : null}
     </>
   );
-}
+}   
