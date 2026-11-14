@@ -65,8 +65,10 @@ export const planetSections: readonly PlanetSection[] = [
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <a
-            href="#waitlist"
+                    <a
+            href={siteContent.subscribeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-6 inline-block rounded-full bg-sage-strong px-6 py-3 font-semibold text-on-sage"
           >
             {siteContent.plan.cta}

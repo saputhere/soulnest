@@ -22,6 +22,8 @@ export const siteContent = {
     tagline: "A place where love never stops arriving.",
   },
 
+  subscribeUrl: "https://www.patreon.com/cw/soulnest",
+
   nav: [
     { label: "How it works", href: "#how-it-works" },
     { label: "Features", href: "#features" },
@@ -30,11 +32,11 @@ export const siteContent = {
   ],
 
   hero: {
-    badge: "Waitlist now open",
+    badge: "Join our caring community",
     headline: "A Place Where Love Never Stops Arriving.",
     subheadline:
       "Someone you love is thinking of you right now. SoulNest makes sure those feelings never fade: letters that arrive when you need them, memories kept safe, and small surprises that remind you you're held.",
-    primaryCta: "Start Your Journey",
+    primaryCta: "Subscribe on Patreon",
     secondaryCta: "Explore SoulNest",
   },
 

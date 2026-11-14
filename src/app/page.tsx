@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import { BackgroundMusic } from "@/components/audio/BackgroundMusic";
 import { CopyrightYear } from "@/components/marketing/CopyrightYear";
-import { WaitlistForm } from "@/components/marketing/WaitlistForm";
 import { PlanetNav } from "@/components/planets/PlanetNav";
 import { UniverseBackground } from "@/components/universe/UniverseBackground";
 import { siteContent } from "@/content/siteContent";
@@ -35,8 +35,22 @@ export default function HomePage() {
             {siteContent.hero.subheadline}
           </p>
 
-          <div className="mt-8 w-full max-w-md">
-            <WaitlistForm />
+          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
+            <a
+              href={siteContent.subscribeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-sage-strong px-8 py-4 text-base font-semibold text-on-sage shadow-lg transition hover:-translate-y-1 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              {siteContent.hero.primaryCta}
+            </a>
+
+            <Link
+              href="/community"
+              className="rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur transition hover:-translate-y-1 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              Visit the Community
+            </Link>
           </div>
 
           <p className="mt-5 text-sm tracking-wide text-ink-muted">{siteContent.plan.name}</p>

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 const MUSIC_SRC = "/music/soulnest-theme.mp3";
 const STORAGE_KEY = "soulnest-music";
-const DEFAULT_VOLUME = 0.35;
+const DEFAULT_VOLUME = 0.15;
 const VOLUME_STEP = 0.05;
 const FADE_DURATION_MS = 1500;
 const FADE_STEP_MS = 50;
