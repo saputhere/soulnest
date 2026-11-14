@@ -34,5 +34,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# One-off database helper scripts (these can read or change production data)
+*-db.mjs
+migrate-*.mjs
+create-community-tables.mjs
+
 # Local folders not part of the project
 parteon items/

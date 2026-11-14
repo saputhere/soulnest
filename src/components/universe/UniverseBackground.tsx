@@ -438,6 +438,7 @@ function drawScene(ctx: CanvasRenderingContext2D, scene: Scene, pointer: Pointer
 /**
  * Full-screen cosmic background: slowly drifting planets, spiral galaxies, and twinkling stars.
  * A small group of stars gathers around the cursor when it pauses; the rest stay in place.
+ * The layer is fixed to the viewport, so it stays behind the content as the page scrolls.
  * With reduced motion enabled, it draws one still frame and does not animate.
  */
 export function UniverseBackground() {
@@ -509,7 +510,7 @@ export function UniverseBackground() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,183,210,0.18),transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(170,218,255,0.16),transparent_60%)]" />
       <canvas ref={canvasRef} className="absolute inset-0" />
     </div>
