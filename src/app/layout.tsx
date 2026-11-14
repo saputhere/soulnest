@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
-import { siteContent } from "@/content/siteContent";
+import { HelpChat } from "@/components/help/HelpChat";
 import { SiteGuard } from "@/components/security/SiteGuard";
+import { siteContent } from "@/content/siteContent";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -16,21 +17,6 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
-
-/**
- * Runs before paint to apply the saved or system theme, which prevents a flash
- * of the wrong theme. This is a constant string, so it's safe to inline.
- */
-const themeScript = `
-(function () {
-  try {
-    var saved = localStorage.getItem("soulnest-theme");
-    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    var isDark = saved ? saved === "dark" : prefersDark;
-    if (isDark) document.documentElement.classList.add("dark");
-  } catch (error) {}
-})();
-`;
 
 export const metadata: Metadata = {
   title: {
@@ -59,12 +45,10 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="bg-canvas font-sans text-ink antialiased">
         <SiteGuard />
         {children}
+        <HelpChat />
       </body>
     </html>
   );
