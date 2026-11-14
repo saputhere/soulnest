@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { BackgroundMusic } from "@/components/audio/BackgroundMusic";
+import { HomeAuthChip } from "@/components/auth/HomeAuthChip";
 import { CopyrightYear } from "@/components/marketing/CopyrightYear";
 import { PatreonPostsSection } from "@/components/home/PatreonPostsSection";
 import { PlanetNav } from "@/components/planets/PlanetNav";
@@ -16,7 +17,14 @@ export default function HomePage() {
       <div className="relative z-10 flex min-h-dvh flex-col">
         <header className="relative flex flex-col items-center gap-5 px-6 pt-6 sm:pt-8">
           <div className="flex flex-col items-center gap-3 sm:absolute sm:right-10 sm:top-8">
-            <Logo height={52} />
+            <div className="flex items-center gap-4">
+              <Suspense
+                fallback={<div className="h-10 w-36 animate-pulse rounded-full bg-white/5" aria-hidden="true" />}
+              >
+                <HomeAuthChip />
+              </Suspense>
+              <Logo height={52} />
+            </div>
             <BackgroundMusic />
           </div>
 

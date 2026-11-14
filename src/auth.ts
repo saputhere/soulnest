@@ -1,7 +1,12 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
-import { saveMember } from "@/lib/members/memberRepository";
+import Credentials from "next-auth/providers/credentials";
+import { findLocalAccount } from "@/lib/auth/localAccounts";
+import { verifyPassword } from "@/lib/auth/passwords";
+import { loginSchema } from "@/lib/auth/schemas";
+import { linkPatreonMember } from "@/lib/members/memberRepository";
 import { parseMembership, type PatreonIdentityPayload } from "@/lib/members/membership";
 import { saveMembership } from "@/lib/members/membershipRepository";
+import type { MemberRole } from "@/types/next-auth";
 
 interface PatreonIdentity extends PatreonIdentityPayload {
   readonly data: {
@@ -44,15 +49,46 @@ export const authConfig: NextAuthConfig = {
         };
       },
     },
+
+    Credentials({
+      id: "local",
+      name: "Email and password",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const parsed = loginSchema.safeParse(credentials);
+        if (!parsed.success) return null;
+
+        const account = await findLocalAccount(parsed.data.email);
+        if (!account) return null;
+
+        const isValid = await verifyPassword(parsed.data.password, account.passwordHash);
+        if (!isValid) return null;
+
+        // Assigned to a variable first, so the extra "role" field isn't flagged as an excess property.
+        const user = {
+          id: account.id,
+          name: account.name || null,
+          email: parsed.data.email,
+          role: account.role,
+        };
+        return user;
+      },
+    }),
   ],
+
   session: { strategy: "jwt" },
   pages: { signIn: "/community" },
+
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, user }) {
       if (account?.provider === "patreon" && profile) {
         const identity = profile as unknown as PatreonIdentity;
 
-        const member = await saveMember(
+        // Attaches to an existing email account with the same email, so one person keeps one record.
+        const member = await linkPatreonMember(
           identity.data.id,
           identity.data.attributes.full_name ?? null,
           identity.data.attributes.email ?? null,
@@ -68,8 +104,16 @@ export const authConfig: NextAuthConfig = {
         token.userId = member.id;
         token.role = member.role;
       }
+
+      if (account?.provider === "local" && user) {
+        const local = user as unknown as { id: string; role: MemberRole };
+        token.userId = local.id;
+        token.role = local.role;
+      }
+
       return token;
     },
+
     session({ session, token }) {
       session.user.id = token.userId ?? "";
       session.user.role = token.role ?? "member";

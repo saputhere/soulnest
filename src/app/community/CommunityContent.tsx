@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { AuthDialog } from "@/components/auth/AuthDialog";
 import { MembershipCard } from "@/components/community/MembershipCard";
 import { NameSetup } from "@/components/community/NameSetup";
 import { NewPostForm } from "@/components/community/NewPostForm";
@@ -7,7 +8,6 @@ import { siteContent } from "@/content/siteContent";
 import { getMemberName, listVisiblePosts } from "@/lib/community/communityRepository";
 import { getViewer } from "@/lib/community/viewer";
 import { getMembership } from "@/lib/members/membershipRepository";
-import { signInWithPatreon } from "./actions";
 
 /** Reads the visitor's session, name, membership, and posts on each request. */
 export async function CommunityContent() {
@@ -25,22 +25,15 @@ export async function CommunityContent() {
           <div className="rounded-[2rem] border border-white/10 bg-[#241a40]/80 p-8 shadow-xl backdrop-blur">
             <p className="font-serif text-2xl text-white">Come share a little of your heart.</p>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/65">
-              Sign in with your Patreon account to post, like, and reply. Your membership status will show here.
+              Sign in with Patreon or create a SoulNest account to post, like, and reply.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <form action={signInWithPatreon}>
-                <button
-                  type="submit"
-                  className="rounded-full bg-gradient-to-r from-[#c9f7e3] to-[#cfeaff] px-7 py-3 font-semibold text-[#2a1f4a] shadow-lg transition hover:-translate-y-0.5"
-                >
-                  Sign in with Patreon
-                </button>
-              </form>
+              <AuthDialog redirectTo="/community" />
               <a
                 href={siteContent.subscribeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-white/20 px-7 py-3 font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Subscribe on Patreon
               </a>
@@ -48,7 +41,7 @@ export async function CommunityContent() {
           </div>
         ) : (
           <>
-            {membership && !viewer?.isAdmin && <MembershipCard membership={membership} />}
+            {membership && <MembershipCard membership={membership} />}
             {displayName ? <NewPostForm displayName={displayName} /> : <NameSetup />}
           </>
         )}

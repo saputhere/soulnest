@@ -289,3 +289,18 @@ export async function reportPost(postId: string, reporterId: string, reason: Rep
 
   return rows.length > 0;
 }
+
+/** The community display name and the account name. The header uses the display name, then the account name. */
+export async function getAccountNames(
+  userId: string,
+): Promise<{ displayName: string | null; fullName: string | null }> {
+  const sql = getSql();
+  const rows = (await sql`
+    SELECT display_name, full_name FROM users WHERE id = ${userId}::uuid
+  `) as { display_name: string | null; full_name: string | null }[];
+
+  return {
+    displayName: rows[0]?.display_name ?? null,
+    fullName: rows[0]?.full_name ?? null,
+  };
+}
