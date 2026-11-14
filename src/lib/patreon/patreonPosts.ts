@@ -6,18 +6,16 @@ export interface PatreonPost {
   readonly teaser: string;
   readonly url: string;
   readonly publishedAt: string | null;
-  readonly imageUrl: string | null;
 }
 
 interface PatreonPostResource {
   readonly id: string;
   readonly attributes: {
     readonly title?: string | null;
-    readonly teaser_text?: string | null;
     readonly url?: string | null;
     readonly published_at?: string | null;
     readonly is_public?: boolean;
-    readonly image?: { readonly large_url?: string; readonly url?: string } | null;
+    readonly is_paid?: boolean;
   };
 }
 
@@ -25,45 +23,63 @@ const MAX_POSTS = 8;
 const FALLBACK_URL = "https://www.patreon.com/cw/soulnest";
 
 /**
- * Fetches the latest public posts from the campaign. Runs on the server and is cached for an hour.
- * Only posts marked public are returned, so paid-only content never reaches the home page.
- * Returns an empty list if anything is missing or fails, so the home page still loads.
+ * Post fields Patreon accepts on this endpoint. Requesting any other field, such as
+ * `teaser_text` or `patreon_url`, makes the whole request fail with a 400.
+ */
+const POST_FIELDS = ["title", "url", "published_at", "is_public", "is_paid"];
+
+export class PatreonPostsError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PatreonPostsError";
+  }
+}
+
+/**
+ * Fetches the campaign's posts and keeps only the ones Patreon marks public.
+ * Failures throw, so an error is never cached as "no posts".
  */
 export async function getPublicPatreonPosts(): Promise<PatreonPost[]> {
   "use cache";
-  cacheLife("hours");
+  cacheLife("minutes");
 
   const token = process.env.PATREON_CREATOR_ACCESS_TOKEN;
   const campaignId = process.env.PATREON_CAMPAIGN_ID;
-  if (!token || !campaignId) return [];
+
+  if (!token) throw new PatreonPostsError("PATREON_CREATOR_ACCESS_TOKEN is not set.");
+  if (!campaignId) throw new PatreonPostsError("PATREON_CAMPAIGN_ID is not set.");
 
   const params = new URLSearchParams({
-    "fields[post]": "title,teaser_text,url,published_at,is_public,image",
+    "fields[post]": POST_FIELDS.join(","),
     "page[count]": "20",
     sort: "-published_at",
   });
 
-  try {
-    const response = await fetch(
-      `https://www.patreon.com/api/oauth2/v2/campaigns/${campaignId}/posts?${params}`,
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
-    if (!response.ok) return [];
+  const response = await fetch(
+    `https://www.patreon.com/api/oauth2/v2/campaigns/${campaignId}/posts?${params}`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
 
-    const payload = (await response.json()) as { data?: PatreonPostResource[] };
-
-    return (payload.data ?? [])
-      .filter((post) => post.attributes.is_public === true)
-      .slice(0, MAX_POSTS)
-      .map((post) => ({
-        id: post.id,
-        title: post.attributes.title ?? "Untitled post",
-        teaser: post.attributes.teaser_text ?? "",
-        url: post.attributes.url ?? FALLBACK_URL,
-        publishedAt: post.attributes.published_at ?? null,
-        imageUrl: post.attributes.image?.large_url ?? post.attributes.image?.url ?? null,
-      }));
-  } catch {
-    return [];
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 300);
+    throw new PatreonPostsError(`Patreon returned ${response.status}: ${detail}`);
   }
+
+  const payload = (await response.json()) as { data?: PatreonPostResource[] };
+  const allPosts = payload.data ?? [];
+
+  if (allPosts.length > 0) {
+    console.info("[patreon] attribute names on first post:", Object.keys(allPosts[0].attributes));
+  }
+
+  const publicPosts = allPosts.filter((post) => post.attributes.is_public === true);
+  console.info(`[patreon] fetched ${allPosts.length} posts, ${publicPosts.length} public`);
+
+  return publicPosts.slice(0, MAX_POSTS).map((post) => ({
+    id: post.id,
+    title: post.attributes.title ?? "Untitled post",
+    teaser: "",
+    url: post.attributes.url ?? FALLBACK_URL,
+    publishedAt: post.attributes.published_at ?? null,
+  }));
 }
