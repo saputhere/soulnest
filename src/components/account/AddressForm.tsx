@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import { saveAddressAction, type ActionState } from "@/app/account/actions";
 import { FormStatus, RequiredNote, SelectField, TextField } from "@/components/ui/FormFields";
 import type { SavedAddress } from "@/lib/account/accountRepository";
@@ -21,24 +21,67 @@ const COUNTRIES = [
 
 const INITIAL: ActionState = { status: "idle" };
 
-/** Pre-selects a saved country. Countries outside the list go into the "Other" text box. */
-function countryFields(country: string | undefined): { select: string; other: string } {
-  if (!country) return { select: "Sri Lanka", other: "" };
-  if ((COUNTRIES as readonly string[]).includes(country)) return { select: country, other: "" };
-  return { select: OTHER, other: country };
+interface AddressValues {
+  readonly fullName: string;
+  readonly phone: string;
+  readonly line1: string;
+  readonly line2: string;
+  readonly city: string;
+  readonly postalCode: string;
+  readonly countrySelect: string;
+  readonly countryOther: string;
+}
+
+/** Converts a saved address (or nothing) into the values the form shows. */
+function valuesFrom(address: SavedAddress | null): AddressValues {
+  const isListed = address !== null && (COUNTRIES as readonly string[]).includes(address.country);
+
+  return {
+    fullName: address?.fullName ?? "",
+    phone: address?.phone ?? "",
+    line1: address?.line1 ?? "",
+    line2: address?.line2 ?? "",
+    city: address?.city ?? "",
+    postalCode: address?.postalCode ?? "",
+    countrySelect: address === null ? "Sri Lanka" : isListed ? address.country : OTHER,
+    countryOther: address !== null && !isListed ? address.country : "",
+  };
 }
 
 export function AddressForm({ address }: { readonly address: SavedAddress | null }) {
   const [state, formAction, isPending] = useActionState(saveAddressAction, INITIAL);
-  const initial = countryFields(address?.country);
-  const [countrySelect, setCountrySelect] = useState(initial.select);
-  const [countryOther, setCountryOther] = useState(initial.other);
+  const [values, setValues] = useState<AddressValues>(() => valuesFrom(address));
+  const [, startTransition] = useTransition();
 
-  const isOther = countrySelect === OTHER;
-  const countryValue = isOther ? countryOther.trim() : countrySelect;
+  // Refresh the fields only when the saved address really changes.
+  const addressKey = JSON.stringify(address);
+  useEffect(() => {
+    setValues(valuesFrom(address));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressKey]);
+
+  const isOther = values.countrySelect === OTHER;
+  const countryValue = isOther ? values.countryOther.trim() : values.countrySelect;
+
+  function update(field: keyof AddressValues) {
+    return (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setValues((current) => ({ ...current, [field]: event.target.value }));
+  }
+
+  /**
+   * Submits the data manually instead of letting the form action run. React 19 resets the
+   * form's inputs after a native form action, which clears these controlled fields.
+   */
+  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(() => {
+      formAction(formData);
+    });
+  }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <RequiredNote />
 
       <fieldset className="grid min-w-0 gap-5 border-0 p-0 sm:grid-cols-2">
@@ -51,7 +94,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           minLength={2}
           maxLength={80}
           autoComplete="name"
-          defaultValue={address?.fullName}
+          value={values.fullName}
+          onChange={update("fullName")}
           placeholder="As it should appear on the parcel"
         />
 
@@ -65,7 +109,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           pattern="[+0-9 ()\-]{7,20}"
           title="Use digits, spaces, +, -, or brackets (7 to 20 characters)."
           maxLength={20}
-          defaultValue={address?.phone}
+          value={values.phone}
+          onChange={update("phone")}
           placeholder="+94 77 123 4567"
           hint="For delivery questions"
         />
@@ -78,7 +123,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           minLength={3}
           maxLength={120}
           autoComplete="address-line1"
-          defaultValue={address?.line1}
+          value={values.line1}
+          onChange={update("line1")}
           placeholder="House number and street"
         />
 
@@ -88,7 +134,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           wide
           maxLength={120}
           autoComplete="address-line2"
-          defaultValue={address?.line2}
+          value={values.line2}
+          onChange={update("line2")}
           placeholder="Apartment, building, landmark"
           hint="Optional"
         />
@@ -100,7 +147,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           minLength={2}
           maxLength={80}
           autoComplete="address-level2"
-          defaultValue={address?.city}
+          value={values.city}
+          onChange={update("city")}
           placeholder="e.g. Colombo"
         />
 
@@ -109,7 +157,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           name="postalCode"
           maxLength={20}
           autoComplete="postal-code"
-          defaultValue={address?.postalCode}
+          value={values.postalCode}
+          onChange={update("postalCode")}
           placeholder="e.g. 00500"
           hint="Optional"
         />
@@ -119,8 +168,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
           required
           wide
           options={COUNTRIES}
-          value={countrySelect}
-          onChange={(event) => setCountrySelect(event.target.value)}
+          value={values.countrySelect}
+          onChange={update("countrySelect")}
         />
 
         {isOther ? (
@@ -130,8 +179,8 @@ export function AddressForm({ address }: { readonly address: SavedAddress | null
             wide
             minLength={2}
             maxLength={60}
-            value={countryOther}
-            onChange={(event) => setCountryOther(event.target.value)}
+            value={values.countryOther}
+            onChange={update("countryOther")}
             placeholder="Type your country"
           />
         ) : null}
