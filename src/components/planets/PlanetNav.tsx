@@ -1,12 +1,12 @@
 "use client";
 
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Planet } from "./Planet";
 import { PlanetModal } from "./PlanetModal";
 import { planetSections, type PlanetSection } from "./planetCatalog";
 
-const SPIN_IN_TRANSITION = { duration: 1.8, ease: [0.22, 1, 0.36, 1] } as const;
+const SPIN_IN_TRANSITION = { duration: 0.9, ease: [0.22, 1, 0.36, 1] } as const;
 
 interface PlanetCardProps {
   readonly section: PlanetSection;
@@ -17,6 +17,7 @@ interface PlanetCardProps {
 }
 
 function PlanetCard({ section, isOpen, spinKey, onOpen }: PlanetCardProps) {
+  const reduceMotion = useReducedMotion();
   const { id, label, palette } = section;
 
   return (
@@ -32,7 +33,7 @@ function PlanetCard({ section, isOpen, spinKey, onOpen }: PlanetCardProps) {
           aria-haspopup="dialog"
           aria-label={`Open ${label}`}
           onClick={() => onOpen(id)}
-          initial={{ rotate: -220, scale: 0.4, opacity: 0 }}
+          initial={reduceMotion ? false : { rotate: -220, scale: 0.4, opacity: 0 }}
           animate={{ rotate: 0, scale: 1, opacity: 1 }}
           whileHover={{ y: -4 }}
           whileTap={{ scale: 0.92 }}
@@ -47,13 +48,10 @@ function PlanetCard({ section, isOpen, spinKey, onOpen }: PlanetCardProps) {
   );
 }
 
-/**
- * Row of planets that open their section in an animated popup.
- * MotionConfig("user") skips transform animations for visitors with reduced motion
- * and keeps the same markup on the server and in the browser, which avoids hydration mismatches.
- */
+/** Row of planets. Every open gets a new key, so a popup never inherits a closing state from an earlier one. */
 export function PlanetNav() {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [openCount, setOpenCount] = useState(0);
   const [spinKeys, setSpinKeys] = useState<Record<string, number>>({});
   const lastOpenedIdRef = useRef<string | null>(null);
 
@@ -61,6 +59,7 @@ export function PlanetNav() {
 
   const handleOpen = useCallback((id: string) => {
     lastOpenedIdRef.current = id;
+    setOpenCount((count) => count + 1);
     setActiveId(id);
   }, []);
 
@@ -80,7 +79,7 @@ export function PlanetNav() {
   }, [activeId]);
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <nav aria-label="Sections">
         <ul className="flex items-end justify-center gap-4 sm:gap-8">
           {planetSections.map((section) => (
@@ -97,9 +96,13 @@ export function PlanetNav() {
 
       <AnimatePresence>
         {activeSection && (
-          <PlanetModal key={activeSection.id} section={activeSection} onClose={handleClose} />
+          <PlanetModal
+            key={`${activeSection.id}-${openCount}`}
+            section={activeSection}
+            onClose={handleClose}
+          />
         )}
       </AnimatePresence>
-    </MotionConfig>
+    </>
   );
 }

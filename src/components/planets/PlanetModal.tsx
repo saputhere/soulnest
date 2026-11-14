@@ -2,14 +2,16 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Planet } from "./Planet";
 import type { PlanetSection } from "./planetCatalog";
 
-const OPEN_SPRING = { type: "spring", stiffness: 75, damping: 20, mass: 1.1 } as const;
-const CLOSE_TRANSITION = { duration: 0.7, ease: [0.45, 0, 0.55, 1] } as const;
-const BACKDROP_TRANSITION = { duration: 0.6 } as const;
-const CONTENT_TRANSITION = { delay: 0.45, duration: 0.7, ease: "easeOut" } as const;
+/* Fast, smooth tweens. Springs take longer to settle, which is what made the popup feel slow. */
+const OPEN_EASE = [0.22, 1, 0.36, 1] as const;
+const OPEN_TRANSITION = { duration: 0.42, ease: OPEN_EASE } as const;
+const CLOSE_TRANSITION = { duration: 0.28, ease: [0.4, 0, 1, 1] } as const;
+const BACKDROP_TRANSITION = { duration: 0.25, ease: "easeOut" } as const;
+const CONTENT_TRANSITION = { delay: 0.12, duration: 0.3, ease: "easeOut" } as const;
 
 interface PlanetModalProps {
   readonly section: PlanetSection;
@@ -17,20 +19,20 @@ interface PlanetModalProps {
 }
 
 /**
- * Popup that opens from its planet with a slow spin. Closing disables pointer events
- * immediately, so the exit animation never blocks clicks on the navigation.
+ * Popup that opens from its planet with a short spin. Each instance tracks its own closing state,
+ * so a fresh open always starts able to close.
  */
 export function PlanetModal({ section, onClose }: PlanetModalProps) {
   const reduceMotion = useReducedMotion();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const hasClosedRef = useRef(false);
+  const closingRef = useRef(false);
   const [isClosing, setIsClosing] = useState(false);
   const { id, label, title, palette, content } = section;
-  const titleId = `planet-title-${id}`;
+  const titleId = useId();
 
   const requestClose = useCallback(() => {
-    if (hasClosedRef.current) return;
-    hasClosedRef.current = true;
+    if (closingRef.current) return;
+    closingRef.current = true;
     setIsClosing(true);
     onClose();
   }, [onClose]);
@@ -43,7 +45,6 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
     function handleKeyDown(event: KeyboardEvent): void {
       if (event.key === "Escape") requestClose();
     }
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [requestClose]);
@@ -58,10 +59,11 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
       exit={{ opacity: 0 }}
       transition={BACKDROP_TRANSITION}
     >
-      <motion.div
-        aria-hidden="true"
+      <motion.button
+        type="button"
+        aria-label="Close"
         onClick={requestClose}
-        className="absolute inset-0 bg-[#140f2a]/70 backdrop-blur-sm"
+        className="absolute inset-0 cursor-default bg-canvas/70 backdrop-blur-[2px]"
       />
 
       <motion.section
@@ -69,15 +71,15 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        initial={reduceMotion ? { opacity: 0 } : { rotate: -270, scale: 0.2, opacity: 0 }}
+        initial={reduceMotion ? { opacity: 0 } : { rotate: -120, scale: 0.6, opacity: 0 }}
         animate={{ rotate: 0, scale: 1, opacity: 1 }}
         exit={
           reduceMotion
             ? { opacity: 0, transition: CLOSE_TRANSITION }
-            : { rotate: 270, scale: 0.2, opacity: 0, transition: CLOSE_TRANSITION }
+            : { rotate: 120, scale: 0.6, opacity: 0, transition: CLOSE_TRANSITION }
         }
-        transition={OPEN_SPRING}
-        className="relative flex max-h-[85dvh] w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#241a40]/95 text-[#f5eefc] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl"
+        transition={OPEN_TRANSITION}
+        className="relative flex max-h-[85dvh] w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#241a40] text-[#f5eefc] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.7)]"
       >
         <header
           className="relative shrink-0 overflow-hidden px-7 pb-8 pt-9 md:px-9"
@@ -88,13 +90,8 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
           <div className="relative flex items-center gap-6">
             <Planet palette={palette} className="h-20 w-20 shrink-0" />
             <div className="min-w-0 pr-12">
-              <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/60">
-                {label}
-              </p>
-              <h2
-                id={titleId}
-                className="mt-2 font-serif text-3xl font-semibold leading-tight text-white md:text-4xl"
-              >
+              <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/60">{label}</p>
+              <h2 id={titleId} className="mt-2 font-serif text-3xl font-semibold leading-tight text-white md:text-4xl">
                 {title}
               </h2>
             </div>
@@ -112,7 +109,7 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
         </header>
 
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={CONTENT_TRANSITION}
           className="min-h-0 overflow-y-auto px-7 py-7 text-white/85 md:px-9 md:py-9"
