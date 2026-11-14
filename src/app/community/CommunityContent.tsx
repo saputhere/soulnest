@@ -48,7 +48,7 @@ export async function CommunityContent() {
           </div>
         ) : (
           <>
-            {membership && <MembershipCard membership={membership} />}
+            {membership && !viewer?.isAdmin && <MembershipCard membership={membership} />}
             {displayName ? <NewPostForm displayName={displayName} /> : <NameSetup />}
           </>
         )}
