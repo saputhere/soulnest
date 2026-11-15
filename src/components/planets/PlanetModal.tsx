@@ -12,6 +12,9 @@ const CLOSE_TRANSITION = { duration: 0.28, ease: [0.4, 0, 1, 1] } as const;
 const BACKDROP_TRANSITION = { duration: 0.25, ease: "easeOut" } as const;
 const CONTENT_TRANSITION = { delay: 0.12, duration: 0.3, ease: "easeOut" } as const;
 
+/** Thin, subtle scrollbar that matches the help chat. Scrolling still works everywhere. */
+const THIN_SCROLL = "[scrollbar-width:thin] [scrollbar-color:rgba(181,245,218,0.35)_transparent]";
+
 interface PlanetModalProps {
   readonly section: PlanetSection;
   readonly onClose: () => void;
@@ -19,7 +22,7 @@ interface PlanetModalProps {
 
 /**
  * Popup that zooms in from the center and zooms back out on close. No rotation.
- * Each instance tracks its own closing state, so a fresh open always starts able to close.
+ * Long content scrolls inside the popup with a thin scrollbar.
  */
 export function PlanetModal({ section, onClose }: PlanetModalProps) {
   const reduceMotion = useReducedMotion();
@@ -110,7 +113,7 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
           initial={reduceMotion ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={CONTENT_TRANSITION}
-          className="min-h-0 overflow-y-auto px-7 py-7 text-white/85 md:px-9 md:py-9"
+          className={`min-h-0 overflow-y-auto px-7 py-7 text-white/85 md:px-9 md:py-9 ${THIN_SCROLL}`}
         >
           {content}
         </motion.div>
