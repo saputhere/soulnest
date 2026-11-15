@@ -6,8 +6,8 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Planet } from "./Planet";
 import type { PlanetSection } from "./planetCatalog";
 
-const OPEN_EASE = [0.22, 1, 0.36, 1] as const;
-const OPEN_TRANSITION = { duration: 0.42, ease: OPEN_EASE } as const;
+const ZOOM_EASE = [0.22, 1, 0.36, 1] as const;
+const OPEN_TRANSITION = { duration: 0.4, ease: ZOOM_EASE } as const;
 const CLOSE_TRANSITION = { duration: 0.28, ease: [0.4, 0, 1, 1] } as const;
 const BACKDROP_TRANSITION = { duration: 0.25, ease: "easeOut" } as const;
 const CONTENT_TRANSITION = { delay: 0.12, duration: 0.3, ease: "easeOut" } as const;
@@ -18,8 +18,8 @@ interface PlanetModalProps {
 }
 
 /**
- * Popup that spins and fades in from the center. It doesn't morph from the planet button,
- * so the planet is never stretched. Each instance tracks its own closing state.
+ * Popup that zooms in from the center and zooms back out on close. No rotation.
+ * Each instance tracks its own closing state, so a fresh open always starts able to close.
  */
 export function PlanetModal({ section, onClose }: PlanetModalProps) {
   const reduceMotion = useReducedMotion();
@@ -69,12 +69,12 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        initial={reduceMotion ? { opacity: 0 } : { rotate: -120, scale: 0.6, opacity: 0 }}
-        animate={{ rotate: 0, scale: 1, opacity: 1 }}
+        initial={reduceMotion ? { opacity: 0 } : { scale: 0.85, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
         exit={
           reduceMotion
             ? { opacity: 0, transition: CLOSE_TRANSITION }
-            : { rotate: 120, scale: 0.6, opacity: 0, transition: CLOSE_TRANSITION }
+            : { scale: 0.85, opacity: 0, transition: CLOSE_TRANSITION }
         }
         transition={OPEN_TRANSITION}
         className="relative flex max-h-[85dvh] w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#241a40] text-[#f5eefc] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.7)]"
