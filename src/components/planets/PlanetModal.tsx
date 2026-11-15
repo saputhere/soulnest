@@ -6,7 +6,6 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Planet } from "./Planet";
 import type { PlanetSection } from "./planetCatalog";
 
-/* Fast, smooth tweens. Springs take longer to settle, which is what made the popup feel slow. */
 const OPEN_EASE = [0.22, 1, 0.36, 1] as const;
 const OPEN_TRANSITION = { duration: 0.42, ease: OPEN_EASE } as const;
 const CLOSE_TRANSITION = { duration: 0.28, ease: [0.4, 0, 1, 1] } as const;
@@ -19,15 +18,15 @@ interface PlanetModalProps {
 }
 
 /**
- * Popup that opens from its planet with a short spin. Each instance tracks its own closing state,
- * so a fresh open always starts able to close.
+ * Popup that spins and fades in from the center. It doesn't morph from the planet button,
+ * so the planet is never stretched. Each instance tracks its own closing state.
  */
 export function PlanetModal({ section, onClose }: PlanetModalProps) {
   const reduceMotion = useReducedMotion();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const closingRef = useRef(false);
   const [isClosing, setIsClosing] = useState(false);
-  const { id, label, title, palette, content } = section;
+  const { label, title, palette, content } = section;
   const titleId = useId();
 
   const requestClose = useCallback(() => {
@@ -67,7 +66,6 @@ export function PlanetModal({ section, onClose }: PlanetModalProps) {
       />
 
       <motion.section
-        layoutId={`planet-${id}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

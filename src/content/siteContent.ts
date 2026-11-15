@@ -98,7 +98,7 @@ export const siteContent = {
   plan: {
     name: "SoulNest Membership",
     tagline: "Everything SoulNest offers in one simple monthly plan.",
-    priceLabel: "$19 a month · billed by Patreon",
+    priceLabel: "$29 a month · billed by Patreon",
     includes: [
       "A monthly box with printed art, Lomo cards, bookmarks, stickers, journals, and a small gift",
       "Handwritten notes and a surprise letter in your box",

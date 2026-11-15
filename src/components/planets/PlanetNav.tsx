@@ -28,7 +28,6 @@ function PlanetCard({ section, isOpen, spinKey, onOpen }: PlanetCardProps) {
         <motion.button
           key={spinKey}
           id={`planet-${id}`}
-          layoutId={`planet-${id}`}
           type="button"
           aria-haspopup="dialog"
           aria-label={`Open ${label}`}
@@ -71,7 +70,6 @@ export function PlanetNav() {
     }
   }, []);
 
-  // Return keyboard focus to the planet that opened the popup.
   useEffect(() => {
     if (activeId === null && lastOpenedIdRef.current) {
       document.getElementById(`planet-${lastOpenedIdRef.current}`)?.focus();
