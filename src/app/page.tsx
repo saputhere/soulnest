@@ -61,6 +61,13 @@ export default function HomePage() {
             >
               Visit the Community
             </Link>
+
+            <Link
+              href="/play"
+              className="rounded-full border border-[#b5f5da]/40 bg-[#b5f5da]/10 px-8 py-4 text-base font-semibold text-white backdrop-blur transition hover:-translate-y-1 hover:bg-[#b5f5da]/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              Play Area
+            </Link>
           </div>
 
           <p className="mt-5 text-sm tracking-wide text-ink-muted">{siteContent.plan.name}</p>
